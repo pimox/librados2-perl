@@ -1,0 +1,9 @@
+Package: librados2-perl
+Version: @@VERSION@@-@@PKGRELEASE@@
+Section: perl
+Priority: optional
+Architecture: @@ARCH@@
+Depends: libc6 (>= 2.2.5), perl (>= 5.14.2-21+deb7u1), perlapi-5.14.2, librados2 (>= 0.72.1)
+Maintainer: Proxmox Support Team <support@proxmox.com>
+Description: Perl bindings for librados
+ This package contains librados perl binding used by Proxmox VE.

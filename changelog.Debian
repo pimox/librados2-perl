@@ -1,0 +1,12 @@
+libpve-storage-perl (3.0-19) unstable; urgency=low
+
+  * glusterfs : create volume through gluster block driver
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 16 Jan 2014 09:38:35 +0100
+
+librados2-perl (0.72.1-1) unstable; urgency=low
+
+  * initial package
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 20 Mar 2009 11:13:19 +0100
+
