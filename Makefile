@@ -38,7 +38,7 @@ dinstall: deb
 .PHONY: install
 install: PVE/RADOS.pm RADOS.so
 	install -D -m 0644 PVE/RADOS.pm ${DESTDIR}${PERLDIR}/PVE/RADOS.pm
-	install -D -m 0644 -s RADOS.so ${DESTDIR}${PERLSODIR}/PVE/RADOS.so
+	install -D -m 0644 -s RADOS.so ${DESTDIR}${PERLSODIR}/PVE/RADOS/RADOS.so
 
 .PHONY: deb ${DEB}
 deb ${DEB}:
