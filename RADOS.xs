@@ -25,7 +25,7 @@ CODE:
 }
 OUTPUT: RETVAL
 
-int 
+void
 pve_rados_conf_set(cluster, key, value) 
 rados_t cluster
 char *key
@@ -33,27 +33,27 @@ char *value
 PROTOTYPE: $$$
 CODE:
 {
-    RETVAL = rados_conf_set(cluster, key, value);
-    if (RETVAL < 0) {		 
-        die("rados_conf_set failed - %s\n", strerror(-RETVAL));
-    }	 
+    int res = rados_conf_set(cluster, key, value);
+    if (res < 0) {		 
+        die("rados_conf_set failed - %s\n", strerror(-res));
+    }
 }
-OUTPUT: RETVAL
 
 
-int pve_rados_connect(cluster) 
+
+void
+pve_rados_connect(cluster) 
 rados_t cluster
 PROTOTYPE: $
 CODE:
 {
     rados_conf_read_file(cluster, NULL);
  
-    RETVAL = rados_connect(cluster);
-    if (RETVAL < 0) {
-        die("rados_connect failed - %s\n", strerror(-RETVAL));
+    int res = rados_connect(cluster);
+    if (res < 0) {
+        die("rados_connect failed - %s\n", strerror(-res));
     }
 }
-OUTPUT: RETVAL
 
 void
 pve_rados_shutdown(cluster) 
@@ -99,8 +99,6 @@ CODE:
         rados_buffer_free(outs);
     }
  
-    printf("TEST %d %d %d\n", ret, outbuflen, outslen);
-
     RETVAL = newSVpv(outbuf, outbuflen);
 
     rados_buffer_free(outbuf);
@@ -121,11 +119,12 @@ CODE:
         XSRETURN_UNDEF;
     }
     HV * rh = (HV *)sv_2mortal((SV *)newHV());
+    SV **t;
 
-    hv_store(rh, "kb", 2, newSViv(result.kb), 0);
-    hv_store(rh, "kb_used", 7, newSViv(result.kb_used), 0);
-    hv_store(rh, "kb_avail", 8, newSViv(result.kb_avail), 0);
-    hv_store(rh, "num_objects", 11, newSViv(result.num_objects), 0);
+    t = hv_store(rh, "kb", 2, newSViv(result.kb), 0);
+    t = hv_store(rh, "kb_used", 7, newSViv(result.kb_used), 0);
+    t = hv_store(rh, "kb_avail", 8, newSViv(result.kb_avail), 0);
+    t = hv_store(rh, "num_objects", 11, newSViv(result.num_objects), 0);
 
     RETVAL = rh;
 }
