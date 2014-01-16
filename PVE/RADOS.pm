@@ -69,6 +69,8 @@ sub cluster_stat {
 sub mon_command {
     my ($self, $cmd) = @_;
 
+    $cmd->{format} = 'json' if !$cmd->{format};
+
     my $json = encode_json($cmd);
     my $raw = pve_rados_mon_command($self->{conn}, [ $json ]);
     if ($cmd->{format} && $cmd->{format} eq 'json') {
