@@ -8,7 +8,8 @@
 
 MODULE = PVE::RADOS		PACKAGE = PVE::RADOS
 
-rados_t pve_rados_create() 
+rados_t 
+pve_rados_create() 
 PROTOTYPE:
 CODE:
 {	
@@ -23,6 +24,22 @@ CODE:
     }
 }
 OUTPUT: RETVAL
+
+int 
+pve_rados_conf_set(cluster, key, value) 
+rados_t cluster
+char *key
+char *value
+PROTOTYPE: $$$
+CODE:
+{
+    RETVAL = rados_conf_set(cluster, key, value);
+    if (RETVAL < 0) {		 
+        die("rados_conf_set failed - %s\n", strerror(-RETVAL));
+    }	 
+}
+OUTPUT: RETVAL
+
 
 int pve_rados_connect(cluster) 
 rados_t cluster

@@ -33,8 +33,18 @@ require XSLoader;
 XSLoader::load('PVE::RADOS', $VERSION);
 
 sub new {
+    my ($class, %params) = @_;
+
     my $conn = pve_rados_create() ||
 	die "unable to create RADOS object\n";
+
+    my $timeout = delete $params{timeout} || 5;
+
+    pve_rados_conf_set($conn, 'client_mount_timeout', $timeout);
+
+    foreach my $k (keys %params) {
+	pve_rados_conf_set($conn, $k, $params{$k});
+    }
 
     pve_rados_connect($conn);
 
