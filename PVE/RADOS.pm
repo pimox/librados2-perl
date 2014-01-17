@@ -74,7 +74,7 @@ sub mon_command {
     my $json = encode_json($cmd);
     my $raw = pve_rados_mon_command($self->{conn}, [ $json ]);
     if ($cmd->{format} && $cmd->{format} eq 'json') {
-	return decode_json($raw);
+	return length($raw) ? decode_json($raw) : undef;
     }
     return $raw;
 }
