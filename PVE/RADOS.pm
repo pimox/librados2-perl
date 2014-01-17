@@ -65,7 +65,8 @@ sub cluster_stat {
     return  pve_rados_cluster_stat($self->{conn});
 }
 
-# example: { prefix => 'mon dump', format => 'json' }
+# example1: { prefix => 'get_command_descriptions'})
+# example2: { prefix => 'mon dump', format => 'json' }
 sub mon_command {
     my ($self, $cmd) = @_;
 
