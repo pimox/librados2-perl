@@ -27,6 +27,9 @@ RADOS.c: RADOS.xs typemap
 	mv RADOS.xsc RADOS.c
 
 CFLAGS= -shared -fPIC -O2 -Wall -Wl,-z,relro -I/usr/lib/perl/5.14.2/CORE -DXS_VERSION=\"1.0\"
+CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
+	-D_FORTIFY_SOURCE=2 -I/usr/lib/perl/5.14.2/CORE -DXS_VERSION=\"1.0\"
+
 RADOS.so: RADOS.c
 	gcc ${CFLAGS} -lrados -o RADOS.so RADOS.c
 

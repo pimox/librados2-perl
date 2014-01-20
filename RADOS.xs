@@ -119,12 +119,11 @@ CODE:
         XSRETURN_UNDEF;
     }
     HV * rh = (HV *)sv_2mortal((SV *)newHV());
-    SV **t;
 
-    t = hv_store(rh, "kb", 2, newSViv(result.kb), 0);
-    t = hv_store(rh, "kb_used", 7, newSViv(result.kb_used), 0);
-    t = hv_store(rh, "kb_avail", 8, newSViv(result.kb_avail), 0);
-    t = hv_store(rh, "num_objects", 11, newSViv(result.num_objects), 0);
+    (void)hv_store(rh, "kb", 2, newSViv(result.kb), 0);
+    (void)hv_store(rh, "kb_used", 7, newSViv(result.kb_used), 0);
+    (void)hv_store(rh, "kb_avail", 8, newSViv(result.kb_avail), 0);
+    (void)hv_store(rh, "num_objects", 11, newSViv(result.num_objects), 0);
 
     RETVAL = rh;
 }
