@@ -16,8 +16,6 @@ print Dumper($res);
 
 $res = $rados->mon_command({ prefix => 'mon dump', format => 'json' });
 print Dumper($res);
-$res = $rados->mon_command({ prefix => 'mon dump', format => 'json' });
-print Dumper($res);
 
 my $stat = $rados->cluster_stat;
 print Dumper($stat);
