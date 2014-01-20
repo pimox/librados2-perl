@@ -6,6 +6,11 @@
 
 #include <rados/librados.h>
 
+#define DEBUG_RADOS 0
+
+#define DPRINTF(fmt, ...)\
+	do { if (DEBUG_RADOS) { printf("debug: " fmt, ## __VA_ARGS__); } } while (0)
+
 MODULE = PVE::RADOS		PACKAGE = PVE::RADOS
 
 rados_t 
@@ -19,7 +24,7 @@ CODE:
     if (ret == 0)
         RETVAL = clu;
     else {
-        warn("rados_create failed (ret=%d)\n", ret);
+        die("rados_create failed - %s\n", strerror(-ret));
         RETVAL = NULL;
     }
 }
@@ -33,13 +38,13 @@ char *value
 PROTOTYPE: $$$
 CODE:
 {
+    DPRINTF("pve_rados_conf_set %s = %s\n", key, value);
+
     int res = rados_conf_set(cluster, key, value);
     if (res < 0) {		 
         die("rados_conf_set failed - %s\n", strerror(-res));
     }
 }
-
-
 
 void
 pve_rados_connect(cluster) 
@@ -47,6 +52,8 @@ rados_t cluster
 PROTOTYPE: $
 CODE:
 {
+    DPRINTF("pve_rados_connect\n");
+
     rados_conf_read_file(cluster, NULL);
  
     int res = rados_connect(cluster);
@@ -61,6 +68,7 @@ rados_t cluster
 PROTOTYPE: $
 CODE:
 {
+    DPRINTF("pve_rados_shutdown");
     rados_shutdown(cluster);
 }
 
@@ -86,6 +94,7 @@ CODE:
             die("too many arguments");
         }
         cmd[cmdlen] = SvPV_nolen(arg);
+        DPRINTF("pve_rados_mon_command%zd %s\n", cmdlen, cmd[cmdlen]);
         cmdlen++;
     } 
 
@@ -95,8 +104,10 @@ CODE:
                                 &outs, &outslen);
 
     if (ret < 0) {
-        die("mon_command failed - %s\n", outs);
+        char msg[4096];
+        snprintf(msg, sizeof(msg), "mon_command failed - %s\n", outs);
         rados_buffer_free(outs);
+        die(msg);
     }
  
     RETVAL = newSVpv(outbuf, outbuflen);
@@ -112,6 +123,9 @@ PROTOTYPE: $
 CODE:
 {
     struct rados_cluster_stat_t result;
+
+    DPRINTF("pve_rados_cluster_stat");
+
     int ret = rados_cluster_stat(cluster, &result);
   
     if(ret != 0) {
