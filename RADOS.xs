@@ -54,9 +54,12 @@ CODE:
 {
     DPRINTF("pve_rados_connect\n");
 
-    rados_conf_read_file(cluster, NULL);
+    int res = rados_conf_read_file(cluster, NULL);
+    if (res < 0) {
+        die("rados_conf_read_file failed - %s\n", strerror(-res));
+    }
  
-    int res = rados_connect(cluster);
+    res = rados_connect(cluster);
     if (res < 0) {
         die("rados_connect failed - %s\n", strerror(-res));
     }
