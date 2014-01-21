@@ -83,6 +83,9 @@ my $kill_worker = sub {
 
     close($self->{child}) if defined($self->{child});
 
+    # only kill if we created the process
+    return if $self->{pid} != $$; 
+
     kill(9, $self->{cpid});
     waitpid($self->{cpid}, 0);
 };
@@ -91,6 +94,8 @@ my $sendcmd = sub {
     my ($self, $cmd, $data, $expect_tag) = @_;
 
     $expect_tag = '>' if !$expect_tag;
+
+    die "detected forked connection" if $self->{pid} != $$;
 
     my ($restag, $raw);
     my $code = sub {
@@ -129,6 +134,7 @@ sub new {
     my $timeout = delete $params{timeout} || $rados_default_timeout;
 
     $self->{timeout} = $timeout;
+    $self->{pid} = $$;
 
     if ($cpid) { # parent
 	close $parent;
