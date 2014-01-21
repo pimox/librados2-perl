@@ -39,8 +39,6 @@ our $VERSION = '1.0';
 require XSLoader;
 XSLoader::load('PVE::RADOS', $VERSION);
 
-# fixme: timeouts??
-
 my $writedata = sub {
     my ($fh, $cmd, $data) = @_;
 
