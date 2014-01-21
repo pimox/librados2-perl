@@ -6,7 +6,9 @@ use warnings;
 use Carp;
 use JSON;
 use Socket;
- 
+use PVE::INotify;
+use PVE::RPCEnvironment;
+
 require Exporter;
 
 our @ISA = qw(Exporter);
@@ -77,6 +79,8 @@ my $readdata = sub {
 sub new {
     my ($class, %params) = @_;
 
+    my $rpcenv = PVE::RPCEnvironment::get();
+
     socketpair(my $child, my $parent, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
 	||  die "socketpair: $!";
 
@@ -99,7 +103,13 @@ sub new {
 
     } else { # child
 	$0 = 'pverados';
- 
+
+	PVE::INotify::inotify_close();
+
+	if (my $atfork = $rpcenv->{atfork}) {
+	    &$atfork();
+	}
+
 	# fixme: timeout?
 
 	close $child;
