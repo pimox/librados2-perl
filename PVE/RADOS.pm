@@ -51,7 +51,7 @@ my $writedata = sub {
 };
 
 my $readdata = sub {
-    my ($fh) = @_;
+    my ($fh, $allow_eof) = @_;
 
     my $head = '';
 
@@ -60,6 +60,8 @@ my $readdata = sub {
     while (length($head) < 5) {
 	last if !sysread $fh, $head, 5 - length($head), length($head);
     }
+    return undef if $allow_eof && length($head) == 0;
+
     die "partial read\n" if length($head) < 5;
     
     my ($cmd, $len) = unpack "a L", $head;
@@ -179,9 +181,9 @@ sub new {
 	$self->{conn} = $conn;
 
 	for (;;) {
-	    my ($cmd, $data) = &$readdata($parent);
+	    my ($cmd, $data) = &$readdata($parent, 1);
 	    
-	    last if $cmd eq 'Q';
+	    last if !$cmd || $cmd eq 'Q';
 
 	    my $res;
 	    eval {
