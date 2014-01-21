@@ -4,10 +4,13 @@ use lib '.';
 use strict;
 use warnings;
 use JSON;
+use PVE::RPCEnvironment;
 
 use Data::Dumper;
 
 use PVE::RADOS;
+
+my $rpcenv = PVE::RPCEnvironment->init('cli');
 
 my $rados = PVE::RADOS::new();
 
