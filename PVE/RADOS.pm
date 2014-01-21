@@ -6,10 +6,14 @@ use warnings;
 use Carp;
 use JSON;
 use Socket;
+use PVE::Tools;
 use PVE::INotify;
 use PVE::RPCEnvironment;
 
 require Exporter;
+
+my $rados_default_timeout = 5;
+
 
 our @ISA = qw(Exporter);
 
@@ -49,7 +53,7 @@ my $writedata = sub {
 };
 
 my $readdata = sub {
-    my ($fh, $expect_result) = @_;
+    my ($fh) = @_;
 
     my $head = '';
 
@@ -68,12 +72,46 @@ my $readdata = sub {
     }
     die "partial data read\n" if length($data) < $len;
 
-    if ($expect_result) { 
-	die $data if $cmd eq 'E' && $data;
-	die "got unexpected result\n" if  $cmd ne '>';
+    return wantarray ? ($cmd, $data) : $data;
+};
+
+my $kill_worker = sub {
+    my ($self) = @_;
+
+    return if !$self->{cpid};
+    return if  $self->{__already_killed};
+
+    $self->{__already_killed} = 1;
+
+    close($self->{child}) if defined($self->{child});
+
+    kill(9, $self->{cpid});
+    waitpid($self->{cpid}, 0);
+};
+
+my $sendcmd = sub {
+    my ($self, $cmd, $data, $expect_tag) = @_;
+
+    $expect_tag = '>' if !$expect_tag;
+
+    my ($restag, $raw);
+    my $code = sub {
+	&$writedata($self->{child}, $cmd, $data) if $expect_tag ne 'S';
+	($restag, $raw) = &$readdata($self->{child});
+    };
+    eval { PVE::Tools::run_with_timeout($self->{timeout}, $code); };
+    if (my $err = $@) {
+	&$kill_worker($self);
+	die $err;
+    }
+    if ($restag eq 'E') {
+	die $raw if $raw;
+	die "unknown error\n";
     }
 
-    return wantarray ? ($cmd, $data) : $data;
+    die "got unexpected result\n" if $restag ne $expect_tag;
+
+    return $raw;
 };
 
 sub new {
@@ -90,16 +128,17 @@ sub new {
 
     my $self = bless {};
 
+    my $timeout = delete $params{timeout} || $rados_default_timeout;
+
+    $self->{timeout} = $timeout;
+
     if ($cpid) { # parent
 	close $parent;
  
 	$self->{cpid} = $cpid;
 	$self->{child} = $child;
 
-	# wait for sync
-	my ($cmd, $msg) = &$readdata($child);
-	die $msg if $cmd eq 'E';
-	die "internal error- got unexpected result" if $cmd ne 'S';
+	&$sendcmd($self, undef, undef, 'S'); # wait for sync
 
     } else { # child
 	$0 = 'pverados';
@@ -113,8 +152,6 @@ sub new {
 	# fixme: timeout?
 
 	close $child;
-
-	my $timeout = delete $params{timeout} || 5;
 
 	my $conn;
 	eval {
@@ -172,9 +209,8 @@ sub DESTROY {
 
     if ($self->{cpid}) {
 	#print "$$: DESTROY WAIT0\n";
-	eval { &$writedata($self->{child}, 'Q'); };
-	my $res = waitpid($self->{cpid}, 0);
-	#print "$$: DESTROY WAIT $res\n";
+	&$kill_worker($self);
+	#print "$$: DESTROY WAIT\n";
     } else {
 	#print "$$: DESTROY SHUTDOWN\n";
 	pve_rados_shutdown($self->{conn}) if $self->{conn};
@@ -186,8 +222,8 @@ sub cluster_stat {
 
     if ($self->{cpid}) {
 	my $data = encode_json(['cluster_stat', @args]);
-	&$writedata($self->{child}, 'C', $data);
-	return decode_json(&$readdata($self->{child}, 1));
+	my $raw = &$sendcmd($self, 'C', $data);
+	return decode_json($raw);
     } else {
 	return pve_rados_cluster_stat($self->{conn});
     }
@@ -202,9 +238,7 @@ sub mon_command {
 
     my $json = encode_json($cmd);
 
-    &$writedata($self->{child}, 'M', $json);
-
-    my $raw = &$readdata($self->{child}, 1);
+    my $raw = &$sendcmd($self, 'M', $json);
 
     if ($cmd->{format} && $cmd->{format} eq 'json') {
 	return length($raw) ? decode_json($raw) : undef;
