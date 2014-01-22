@@ -210,6 +210,14 @@ sub new {
     return $self;
 }
 
+sub timeout {
+    my ($self, $new_timeout) = @_;
+
+    $self->{timeout} = $new_timeout if $new_timeout;
+
+    return $self->{timeout};
+}
+
 sub DESTROY {
     my ($self) = @_;
 
