@@ -3,7 +3,7 @@ Version: @@VERSION@@-@@PKGRELEASE@@
 Section: perl
 Priority: optional
 Architecture: @@ARCH@@
-Depends: libc6 (>= 2.2.5), perl (>= 5.14.2-21+deb7u1), perlapi-5.14.2, librados2 (>= 0.67.5), libpve-access-control
+Depends: libc6 (>= 2.2.5), perl (>= 5.20.1-5), perlapi-5.20.1, librados2 (>= 0.67.5), libpve-access-control
 Maintainer: Proxmox Support Team <support@proxmox.com>
 Description: Perl bindings for librados
  This package contains librados perl binding used by Proxmox VE.

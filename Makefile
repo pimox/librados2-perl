@@ -1,8 +1,8 @@
-RELEASE=3.1
+RELEASE=4.0
 
 VERSION=1.0
 PACKAGE=librados2-perl
-PKGREL=1
+PKGREL=2
 
 DESTDIR=
 PREFIX=/usr
@@ -13,7 +13,7 @@ MANDIR=${PREFIX}/share/man
 DOCDIR=${PREFIX}/share/doc/${PACKAGE}
 MAN1DIR=${MANDIR}/man1/
 PERLDIR=${PREFIX}/share/perl5
-PERLSODIR=${LIBDIR}/perl5/auto
+PERLSODIR=${LIBDIR}/x86_64-linux-gnu/perl/5.20.1/auto/
 
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell cat .git/refs/heads/master)
@@ -26,9 +26,9 @@ RADOS.c: RADOS.xs typemap
 	xsubpp RADOS.xs -typemap typemap > RADOS.xsc
 	mv RADOS.xsc RADOS.c
 
-CFLAGS= -shared -fPIC -O2 -Wall -Wl,-z,relro -I/usr/lib/perl/5.14.2/CORE -DXS_VERSION=\"1.0\"
+CFLAGS= -shared -fPIC -O2 -Wall -Wl,-z,relro -I/usr/lib/x86_64-linux-gnu/perl/5.20.1/CORE -DXS_VERSION=\"1.0\"
 CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
-	-D_FORTIFY_SOURCE=2 -I/usr/lib/perl/5.14.2/CORE -DXS_VERSION=\"1.0\"
+	-D_FORTIFY_SOURCE=2 -I/usr/lib/x86_64-linux-gnu/perl/5.20.1/CORE -DXS_VERSION=\"1.0\"
 
 RADOS.so: RADOS.c
 	gcc ${CFLAGS} -lrados -o RADOS.so RADOS.c

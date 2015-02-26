@@ -1,3 +1,9 @@
+librados2-perl (1.0-2) unstable; urgency=medium
+
+  * update package dependencies for Debian Jessie
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 26 Feb 2015 13:28:45 +0100
+
 librados2-perl (1.0-1) unstable; urgency=low
 
   * depend on ceph dumpling (instead of emperor).
