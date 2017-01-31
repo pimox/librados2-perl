@@ -13,7 +13,16 @@ MANDIR=${PREFIX}/share/man
 DOCDIR=${PREFIX}/share/doc/${PACKAGE}
 MAN1DIR=${MANDIR}/man1/
 PERLDIR=${PREFIX}/share/perl5
-PERLSODIR=${LIBDIR}/x86_64-linux-gnu/perl/5.20/auto/
+
+PERL_ARCHLIB := `perl -MConfig -e 'print $$Config{archlib};'`
+PERL_INSTALLVENDORARCH := `perl -MConfig -e 'print $$Config{installvendorarch};'`
+
+CFLAGS= -shared -fPIC -O2 -Wall -Wl,-z,relro -I$(PERL_ARCHLIB)/CORE -DXS_VERSION=\"1.0\"
+CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
+	-D_FORTIFY_SOURCE=2 -I$(PERL_ARCHLIB)/CORE -DXS_VERSION=\"1.0\"
+
+
+PERLSODIR=$(PERL_INSTALLVENDORARCH)/auto
 
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell cat .git/refs/heads/master)
@@ -25,10 +34,6 @@ all: ${DEB}
 RADOS.c: RADOS.xs typemap
 	xsubpp RADOS.xs -typemap typemap > RADOS.xsc
 	mv RADOS.xsc RADOS.c
-
-CFLAGS= -shared -fPIC -O2 -Wall -Wl,-z,relro -I/usr/lib/x86_64-linux-gnu/perl/5.20/CORE -DXS_VERSION=\"1.0\"
-CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
-	-D_FORTIFY_SOURCE=2 -I/usr/lib/x86_64-linux-gnu/perl/5.20/CORE -DXS_VERSION=\"1.0\"
 
 RADOS.so: RADOS.c
 	gcc ${CFLAGS} -lrados -o RADOS.so RADOS.c
@@ -44,7 +49,8 @@ install: PVE/RADOS.pm RADOS.so
 	install -D -m 0644 -s RADOS.so ${DESTDIR}${PERLSODIR}/PVE/RADOS/RADOS.so
 
 .PHONY: deb ${DEB}
-deb ${DEB}:
+deb: ${DEB}
+${DEB}:
 	rm -rf debian
 	mkdir debian
 	make DESTDIR=${CURDIR}/debian install
