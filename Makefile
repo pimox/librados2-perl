@@ -60,7 +60,7 @@ ${DEB}:
 	install -m 0644 changelog.Debian debian/${DOCDIR}/
 	gzip -9 -n debian/${DOCDIR}/changelog.Debian
 	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > debian/${DOCDIR}/SOURCE
-	dpkg-deb --build debian	
+	fakeroot dpkg-deb --build debian	
 	mv debian.deb ${DEB}
 	rm -rf debian
 	lintian ${DEB}
