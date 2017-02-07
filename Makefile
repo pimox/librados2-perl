@@ -16,6 +16,7 @@ PERLDIR=${PREFIX}/share/perl5
 
 PERL_ARCHLIB := `perl -MConfig -e 'print $$Config{archlib};'`
 PERL_INSTALLVENDORARCH := `perl -MConfig -e 'print $$Config{installvendorarch};'`
+PERL_APIVER := `perl -MConfig -e 'print $$Config{debian_abi}//$$Config{version};'`
 
 CFLAGS= -shared -fPIC -O2 -Wall -Wl,-z,relro -I$(PERL_ARCHLIB)/CORE -DXS_VERSION=\"1.0\"
 CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
@@ -55,7 +56,7 @@ ${DEB}:
 	mkdir debian
 	make DESTDIR=${CURDIR}/debian install
 	install -d -m 0755 debian/DEBIAN
-	sed -e s/@@VERSION@@/${VERSION}/ -e s/@@PKGRELEASE@@/${PKGREL}/ -e s/@@ARCH@@/${ARCH}/ <control.in >debian/DEBIAN/control
+	sed -e s/@@VERSION@@/${VERSION}/ -e s/@@PKGRELEASE@@/${PKGREL}/ -e s/@@ARCH@@/${ARCH}/ -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" <control.in >debian/DEBIAN/control
 	install -D -m 0644 copyright debian/${DOCDIR}/copyright
 	install -m 0644 changelog.Debian debian/${DOCDIR}/
 	gzip -9 -n debian/${DOCDIR}/changelog.Debian
