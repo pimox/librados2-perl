@@ -58,7 +58,7 @@ ${DEB}:
 	sed -e s/@@VERSION@@/${VERSION}/ -e s/@@PKGRELEASE@@/${PKGREL}/ -e s/@@ARCH@@/${ARCH}/ <control.in >debian/DEBIAN/control
 	install -D -m 0644 copyright debian/${DOCDIR}/copyright
 	install -m 0644 changelog.Debian debian/${DOCDIR}/
-	gzip -9 debian/${DOCDIR}/changelog.Debian
+	gzip -9 -n debian/${DOCDIR}/changelog.Debian
 	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > debian/${DOCDIR}/SOURCE
 	dpkg-deb --build debian	
 	mv debian.deb ${DEB}
