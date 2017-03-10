@@ -1,3 +1,9 @@
+librados2-perl (1.0-4) unstable; urgency=medium
+
+  * rebuild for PVE 5.0 / Debian Stretch
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 10 Mar 2017 13:15:52 +0100
+
 librados2-perl (1.0-3) unstable; urgency=medium
 
   * fix perl path
