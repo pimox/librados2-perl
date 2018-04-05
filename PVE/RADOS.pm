@@ -13,6 +13,7 @@ use PVE::RPCEnvironment;
 require Exporter;
 
 my $rados_default_timeout = 5;
+my $ceph_default_conf = '/etc/ceph/ceph.conf';
 
 
 our @ISA = qw(Exporter);
@@ -163,6 +164,16 @@ sub new {
 	eval {
 	    $conn = pve_rados_create() ||
 		die "unable to create RADOS object\n";
+
+	    if (defined($params{ceph_conf}) && (!-e $params{ceph_conf})) {
+		die "Supplied ceph config doesn't exist, $params{ceph_conf}";
+	    }
+
+	    my $ceph_conf = delete $params{ceph_conf} || $ceph_default_conf;
+
+	    if (-e $ceph_conf) {
+		pve_rados_conf_read_file($conn, $ceph_conf);
+	    }
 
 	    pve_rados_conf_set($conn, 'client_mount_timeout', $timeout);
 

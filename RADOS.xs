@@ -47,6 +47,27 @@ CODE:
 }
 
 void
+pve_rados_conf_read_file(cluster, path)
+rados_t cluster
+SV *path
+PROTOTYPE: $$
+CODE:
+{
+    char *p = NULL;
+
+    if (SvOK(path)) {
+	p = SvPV_nolen(path);
+    }
+
+    DPRINTF("pve_rados_conf_read_file %s\n", p);
+
+    int res = rados_conf_read_file(cluster, p);
+    if (res < 0) {
+        die("rados_conf_read_file failed - %s\n", strerror(-res));
+    }
+}
+
+void
 pve_rados_connect(cluster)
 rados_t cluster
 PROTOTYPE: $
@@ -54,12 +75,7 @@ CODE:
 {
     DPRINTF("pve_rados_connect\n");
 
-    int res = rados_conf_read_file(cluster, NULL);
-    if (res < 0) {
-        die("rados_conf_read_file failed - %s\n", strerror(-res));
-    }
-
-    res = rados_connect(cluster);
+    int res = rados_connect(cluster);
     if (res < 0) {
         die("rados_connect failed - %s\n", strerror(-res));
     }
