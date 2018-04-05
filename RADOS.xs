@@ -13,14 +13,14 @@
 
 MODULE = PVE::RADOS		PACKAGE = PVE::RADOS
 
-rados_t 
-pve_rados_create() 
+rados_t
+pve_rados_create()
 PROTOTYPE:
 CODE:
-{	
-    rados_t clu = NULL;	 
+{
+    rados_t clu = NULL;
     int ret = rados_create(&clu, NULL);
-    
+
     if (ret == 0)
         RETVAL = clu;
     else {
@@ -31,7 +31,7 @@ CODE:
 OUTPUT: RETVAL
 
 void
-pve_rados_conf_set(cluster, key, value) 
+pve_rados_conf_set(cluster, key, value)
 rados_t cluster
 char *key
 char *value
@@ -41,13 +41,13 @@ CODE:
     DPRINTF("pve_rados_conf_set %s = %s\n", key, value);
 
     int res = rados_conf_set(cluster, key, value);
-    if (res < 0) {		 
+    if (res < 0) {
         die("rados_conf_set failed - %s\n", strerror(-res));
     }
 }
 
 void
-pve_rados_connect(cluster) 
+pve_rados_connect(cluster)
 rados_t cluster
 PROTOTYPE: $
 CODE:
@@ -58,7 +58,7 @@ CODE:
     if (res < 0) {
         die("rados_conf_read_file failed - %s\n", strerror(-res));
     }
- 
+
     res = rados_connect(cluster);
     if (res < 0) {
         die("rados_connect failed - %s\n", strerror(-res));
@@ -66,7 +66,7 @@ CODE:
 }
 
 void
-pve_rados_shutdown(cluster) 
+pve_rados_shutdown(cluster)
 rados_t cluster
 PROTOTYPE: $
 CODE:
@@ -76,7 +76,7 @@ CODE:
 }
 
 SV *
-pve_rados_mon_command(cluster, cmds) 
+pve_rados_mon_command(cluster, cmds)
 rados_t cluster
 AV *cmds
 PROTOTYPE: $$
@@ -99,7 +99,7 @@ CODE:
         cmd[cmdlen] = SvPV_nolen(arg);
         DPRINTF("pve_rados_mon_command%zd %s\n", cmdlen, cmd[cmdlen]);
         cmdlen++;
-    } 
+    }
 
     int ret = rados_mon_command(cluster, cmd, cmdlen,
                                 NULL, 0,
@@ -112,15 +112,15 @@ CODE:
         rados_buffer_free(outs);
         die(msg);
     }
- 
+
     RETVAL = newSVpv(outbuf, outbuflen);
 
     rados_buffer_free(outbuf);
 }
 OUTPUT: RETVAL
 
-HV * 
-pve_rados_cluster_stat(cluster) 
+HV *
+pve_rados_cluster_stat(cluster)
 rados_t cluster
 PROTOTYPE: $
 CODE:
@@ -130,7 +130,7 @@ CODE:
     DPRINTF("pve_rados_cluster_stat");
 
     int ret = rados_cluster_stat(cluster, &result);
-  
+
     if(ret != 0) {
         warn("rados_cluster_stat failed (ret=%d)\n", ret);
         XSRETURN_UNDEF;

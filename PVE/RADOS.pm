@@ -43,7 +43,7 @@ my $writedata = sub {
     my ($fh, $cmd, $data) = @_;
 
     local $SIG{PIPE} = 'IGNORE';
- 
+
     my $bin = pack "a L/a*", $cmd, $data || '';
     my $res = syswrite $fh, $bin;
 
@@ -63,7 +63,7 @@ my $readdata = sub {
     return undef if $allow_eof && length($head) == 0;
 
     die "partial read\n" if length($head) < 5;
-    
+
     my ($cmd, $len) = unpack "a L", $head;
 
     my $data = '';
@@ -86,7 +86,7 @@ my $kill_worker = sub {
     close($self->{child}) if defined($self->{child});
 
     # only kill if we created the process
-    return if $self->{pid} != $$; 
+    return if $self->{pid} != $$;
 
     kill(9, $self->{cpid});
     waitpid($self->{cpid}, 0);
@@ -140,7 +140,7 @@ sub new {
 
     if ($cpid) { # parent
 	close $parent;
- 
+
 	$self->{cpid} = $cpid;
 	$self->{child} = $child;
 
@@ -182,7 +182,7 @@ sub new {
 
 	for (;;) {
 	    my ($cmd, $data) = &$readdata($parent, 1);
-	    
+
 	    last if !$cmd || $cmd eq 'Q';
 
 	    my $res;
@@ -203,7 +203,7 @@ sub new {
 	    }
 	    &$writedata($parent, '>', $res);
 	}
- 
+
 	exit(0);
     }
 
