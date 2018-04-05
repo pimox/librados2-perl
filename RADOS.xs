@@ -14,12 +14,19 @@
 MODULE = PVE::RADOS		PACKAGE = PVE::RADOS
 
 rados_t
-pve_rados_create()
-PROTOTYPE:
+pve_rados_create(user)
+SV *user
+PROTOTYPE: $
 CODE:
 {
+    char *u = NULL;
     rados_t clu = NULL;
-    int ret = rados_create(&clu, NULL);
+
+    if (SvOK(user)) {
+	u = SvPV_nolen(user);
+    }
+
+    int ret = rados_create(&clu, u);
 
     if (ret == 0)
         RETVAL = clu;

@@ -14,6 +14,7 @@ require Exporter;
 
 my $rados_default_timeout = 5;
 my $ceph_default_conf = '/etc/ceph/ceph.conf';
+my $ceph_default_user = 'admin';
 
 
 our @ISA = qw(Exporter);
@@ -162,7 +163,8 @@ sub new {
 
 	my $conn;
 	eval {
-	    $conn = pve_rados_create() ||
+	    my $ceph_user = delete $params{userid} || $ceph_default_user;
+	    $conn = pve_rados_create($ceph_user) ||
 		die "unable to create RADOS object\n";
 
 	    if (defined($params{ceph_conf}) && (!-e $params{ceph_conf})) {
