@@ -99,7 +99,7 @@ my $sendcmd = sub {
 
     $expect_tag = '>' if !$expect_tag;
 
-    die "detected forked connection" if $self->{pid} != $$;
+    die "detected forked connection\n" if $self->{pid} != $$;
 
     my ($restag, $raw);
     my $code = sub {
@@ -127,7 +127,7 @@ sub new {
     my $rpcenv = PVE::RPCEnvironment::get();
 
     socketpair(my $child, my $parent, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
-	||  die "socketpair: $!";
+	||  die "socketpair: $!\n";
 
     my $cpid = fork();
 
@@ -168,7 +168,7 @@ sub new {
 		die "unable to create RADOS object\n";
 
 	    if (defined($params{ceph_conf}) && (!-e $params{ceph_conf})) {
-		die "Supplied ceph config doesn't exist, $params{ceph_conf}";
+		die "Supplied ceph config doesn't exist, $params{ceph_conf}\n";
 	    }
 
 	    my $ceph_conf = delete $params{ceph_conf} || $ceph_default_conf;
