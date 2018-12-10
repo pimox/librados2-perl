@@ -26,7 +26,7 @@ CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
 PERLSODIR=$(PERL_INSTALLVENDORARCH)/auto
 
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
-GITVERSION:=$(shell cat .git/refs/heads/master)
+GITVERSION:=$(shell git rev-parse HEAD)
 
 DEB=${PACKAGE}_${VERSION}-${PKGREL}_${ARCH}.deb
 DSC=${PACKAGE}_${VERSION}-${PKGREL}.dsc
