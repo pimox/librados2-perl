@@ -29,6 +29,7 @@ ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell cat .git/refs/heads/master)
 
 DEB=${PACKAGE}_${VERSION}-${PKGREL}_${ARCH}.deb
+DSC=${PACKAGE}_${VERSION}-${PKGREL}.dsc
 
 all:
 
@@ -60,9 +61,19 @@ ${DEB}:
 	cd build; dpkg-buildpackage -b -us -uc
 	lintian ${DEB}
 
+.PHONY: dsc
+dsc: ${DSC}
+${DSC}:
+	rm -rf build
+	rsync -a * build
+	sed -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" debian/control.in >build/debian/control
+	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > build/debian/SOURCE
+	cd build; dpkg-buildpackage -S -us -uc -d -nc
+	lintian ${DSC}
+
 .PHONY: clean
 clean: 	
-	rm -rf *~ build *.deb *.changes *.buildinfo
+	rm -rf *~ build *.deb *.changes *.buildinfo *.dsc *.tar.gz
 	find . -name '*~' -exec rm {} ';'
 
 .PHONY: distclean
