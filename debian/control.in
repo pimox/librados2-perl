@@ -1,0 +1,17 @@
+Source: librados2-perl
+Section: perl
+Priority: optional
+Maintainer: Proxmox Support Team <support@proxmox.com>
+Build-Depends: debhelper (>= 10~)
+Standards-Version: 3.9.8
+Homepage: http://www.proxmox.com
+
+Package: librados2-perl
+Architecture: any
+Depends: libc6 (>= 2.2.5),
+         libpve-access-control,
+         librados2 (>= 0.67.5),
+         perl (>= 5.20.1-5),
+         @PERLAPI@,
+Description: Perl bindings for librados
+ This package contains librados perl binding used by Proxmox VE.

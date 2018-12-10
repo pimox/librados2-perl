@@ -30,7 +30,7 @@ GITVERSION:=$(shell cat .git/refs/heads/master)
 
 DEB=${PACKAGE}_${VERSION}-${PKGREL}_${ARCH}.deb
 
-all: ${DEB}
+all:
 
 RADOS.c: RADOS.xs typemap
 	xsubpp RADOS.xs -typemap typemap > RADOS.xsc
@@ -49,26 +49,20 @@ install: PVE/RADOS.pm RADOS.so
 	install -D -m 0644 PVE/RADOS.pm ${DESTDIR}${PERLDIR}/PVE/RADOS.pm
 	install -D -m 0644 -s RADOS.so ${DESTDIR}${PERLSODIR}/PVE/RADOS/RADOS.so
 
-.PHONY: deb ${DEB}
+
+.PHONY: deb
 deb: ${DEB}
 ${DEB}:
-	rm -rf debian
-	mkdir debian
-	make DESTDIR=${CURDIR}/debian install
-	install -d -m 0755 debian/DEBIAN
-	sed -e s/@@VERSION@@/${VERSION}/ -e s/@@PKGRELEASE@@/${PKGREL}/ -e s/@@ARCH@@/${ARCH}/ -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" <control.in >debian/DEBIAN/control
-	install -D -m 0644 copyright debian/${DOCDIR}/copyright
-	install -m 0644 changelog.Debian debian/${DOCDIR}/
-	gzip -9 -n debian/${DOCDIR}/changelog.Debian
-	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > debian/${DOCDIR}/SOURCE
-	fakeroot dpkg-deb --build debian	
-	mv debian.deb ${DEB}
-	rm -rf debian
+	rm -rf build
+	rsync -a * build
+	sed -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" debian/control.in >build/debian/control
+	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > build/debian/SOURCE
+	cd build; dpkg-buildpackage -b -us -uc
 	lintian ${DEB}
 
 .PHONY: clean
 clean: 	
-	rm -rf debian *.deb ${PACKAGE}-*.tar.gz dist *.1.pod *.1.gz RADOS.so RADOS.c
+	rm -rf *~ build *.deb *.changes *.buildinfo
 	find . -name '*~' -exec rm {} ';'
 
 .PHONY: distclean
