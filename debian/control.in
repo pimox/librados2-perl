@@ -8,10 +8,12 @@ Homepage: http://www.proxmox.com
 
 Package: librados2-perl
 Architecture: any
-Depends: libc6 (>= 2.2.5),
-         libpve-access-control,
+Depends: libpve-access-control,
          librados2 (>= 0.67.5),
          perl (>= 5.20.1-5),
+         ${misc:Depends},
+         ${perl:Depends},
+         ${shlibs:Depends},
          @PERLAPI@,
 Description: Perl bindings for librados
  This package contains librados perl binding used by Proxmox VE.
