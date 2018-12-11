@@ -4,6 +4,8 @@ VERSION=1.0
 PACKAGE=librados2-perl
 PKGREL=5
 
+BUILDSRC := $(PACKAGE)-$(VERSION)
+
 DESTDIR=
 PREFIX=/usr
 BINDIR=${PREFIX}/bin
@@ -50,25 +52,23 @@ install: PVE/RADOS.pm RADOS.so
 	install -D -m 0644 PVE/RADOS.pm ${DESTDIR}${PERLDIR}/PVE/RADOS.pm
 	install -D -m 0644 -s RADOS.so ${DESTDIR}${PERLSODIR}/PVE/RADOS/RADOS.so
 
+.PHONY: $(BUILDSRC)
+$(BUILDSRC):
+	rm -rf $(BUILDSRC)
+	rsync -a * $(BUILDSRC)
+	sed -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" debian/control.in >$(BUILDSRC)/debian/control
+	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > $(BUILDSRC)/debian/SOURCE
 
 .PHONY: deb
 deb: ${DEB}
-${DEB}:
-	rm -rf build
-	rsync -a * build
-	sed -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" debian/control.in >build/debian/control
-	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > build/debian/SOURCE
-	cd build; dpkg-buildpackage -b -us -uc
+${DEB}: $(BUILDSRC)
+	cd $(BUILDSRC); dpkg-buildpackage -b -us -uc
 	lintian ${DEB}
 
 .PHONY: dsc
 dsc: ${DSC}
-${DSC}:
-	rm -rf build
-	rsync -a * build
-	sed -e "s|@PERLAPI@|perlapi-$(PERL_APIVER)|g" debian/control.in >build/debian/control
-	echo "git clone git://git.proxmox.com/git/librados2-perl.git\\ngit checkout ${GITVERSION}" > build/debian/SOURCE
-	cd build; dpkg-buildpackage -S -us -uc -d -nc
+${DSC}: $(BUILDSRC)
+	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d -nc
 	lintian ${DSC}
 
 .PHONY: clean
