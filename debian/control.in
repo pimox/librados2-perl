@@ -2,9 +2,10 @@ Source: librados2-perl
 Section: perl
 Priority: optional
 Maintainer: Proxmox Support Team <support@proxmox.com>
-Build-Depends: debhelper (>= 10~)
+Build-Depends: debhelper (>= 10~),
+               librados-dev,
 Standards-Version: 3.9.8
-Homepage: http://www.proxmox.com
+Homepage: https://www.proxmox.com/
 
 Package: librados2-perl
 Architecture: any
