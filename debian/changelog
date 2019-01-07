@@ -1,3 +1,9 @@
+librados2-perl (1.0-6) unstable; urgency=medium
+
+  * fix #1950: use /etc/pve/ceph.conf as default
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 07 Jan 2019 13:43:58 +0100
+
 librados2-perl (1.0-5) unstable; urgency=medium
 
   * allow to specify the userid with rados_create
