@@ -1,10 +1,9 @@
-RELEASE=5.0
+include /usr/share/dpkg/pkg-info.mk
+include /usr/share/dpkg/architecture.mk
 
-VERSION=1.0
 PACKAGE=librados2-perl
-PKGREL=6
 
-BUILDSRC := $(PACKAGE)-$(VERSION)
+BUILDSRC := $(PACKAGE)-$(DEB_VERSION_UPSTREAM)
 
 DESTDIR=
 PREFIX=/usr
@@ -27,11 +26,10 @@ CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
 
 PERLSODIR=$(PERL_INSTALLVENDORARCH)/auto
 
-ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell git rev-parse HEAD)
 
-DEB=${PACKAGE}_${VERSION}-${PKGREL}_${ARCH}.deb
-DSC=${PACKAGE}_${VERSION}-${PKGREL}.dsc
+DEB=${PACKAGE}_${DEB_VERSION_UPSTREAM_REVISION}_${DEB_BUILD_ARCH}.deb
+DSC=${PACKAGE}_${DEB_VERSION_UPSTREAM_REVISION}.dsc
 
 all:
 
@@ -82,4 +80,4 @@ distclean: clean
 
 .PHONY: upload
 upload: ${DEB}
-	tar cf - ${DEB} | ssh repoman@repo.proxmox.com -- upload --product pve --dist stretch --arch ${ARCH}
+	tar cf - ${DEB} | ssh repoman@repo.proxmox.com -- upload --product pve --dist stretch --arch ${DEB_BUILD_ARCH}
