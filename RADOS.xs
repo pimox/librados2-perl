@@ -131,8 +131,14 @@ CODE:
 
     if (ret < 0) {
         char msg[4096];
-        snprintf(msg, sizeof(msg), "mon_command failed - %s\n", outs);
+        if (outslen > sizeof(msg)) {
+            outslen = sizeof(msg);
+        }
+        snprintf(msg, sizeof(msg), "mon_command failed - %.*s\n", (int)outslen, outs);
         rados_buffer_free(outs);
+        if (outbuf != NULL) {
+            rados_buffer_free(outbuf);
+        }
         die(msg);
     }
 
