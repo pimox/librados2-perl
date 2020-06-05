@@ -265,7 +265,8 @@ sub mon_command {
 
     my $json = encode_json($cmd);
 
-    my $raw = &$sendcmd($self, 'M', $json);
+    my $raw = eval { $sendcmd->($self, 'M', $json) };
+    die "error with '$cmd->{prefix}': $@" if $@;
 
     if ($cmd->{format} && $cmd->{format} eq 'json') {
 	return length($raw) ? decode_json($raw) : undef;
