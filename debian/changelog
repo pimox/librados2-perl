@@ -1,3 +1,11 @@
+librados2-perl (1.2-1) pve; urgency=medium
+
+  * re-build for Debian 11 Bullseye / PVE 7
+
+  * mon_command: include prefix in error message
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 20 May 2021 14:41:10 +0200
+
 librados2-perl (1.1-2) pve; urgency=medium
 
   * fix read behind string ending in error handling
