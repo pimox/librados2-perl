@@ -19,9 +19,10 @@ PERL_ARCHLIB := `perl -MConfig -e 'print $$Config{archlib};'`
 PERL_INSTALLVENDORARCH := `perl -MConfig -e 'print $$Config{installvendorarch};'`
 PERL_APIVER := `perl -MConfig -e 'print $$Config{debian_abi}//$$Config{version};'`
 
-CFLAGS= -shared -fPIC -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro \
-	-D_FORTIFY_SOURCE=2 -I$(PERL_ARCHLIB)/CORE -DXS_VERSION=\"1.0\"
-
+# overwrite as not all Debian default flags work for the XS code (e.g., -Wformat-security)
+CFLAGS = -shared -fPIC -g -O2 -Werror -Wtype-limits -Wall -Wl,-z,relro
+CFLAGS += -D_FORTIFY_SOURCE=2 -I$(PERL_ARCHLIB)/CORE -DXS_VERSION=\"1.0\"
+CFLAGS += -fstack-protector-strong -Wformat
 
 PERLSODIR=$(PERL_INSTALLVENDORARCH)/auto
 
