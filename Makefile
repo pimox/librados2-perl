@@ -38,7 +38,7 @@ RADOS.c: RADOS.xs typemap
 	mv RADOS.xsc RADOS.c
 
 RADOS.so: RADOS.c
-	gcc $(CFLAGS) -lrados -o RADOS.so RADOS.c
+	$(CC) $(CFLAGS) -o RADOS.so RADOS.c -lrados
 
 .PHONY: dinstall
 dinstall: deb
